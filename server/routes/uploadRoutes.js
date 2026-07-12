@@ -1,40 +1,65 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
 const { put } = require('@vercel/blob');
 const { protect, adminOnly } = require('../middleware/authMiddleware');
-
-// Store file in memory (buffer), not disk — required for Vercel serverless
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB max
-  fileFilter: (req, file, cb) => {
-    if (!file.mimetype.startsWith('image/')) {
-      return cb(new Error('Only image files are allowed'));
-    }
-    cb(null, true);
-  },
-});
+const Busboy = require('busboy');
 
 // POST /api/upload — admin only, upload image to Vercel Blob
-router.post('/', protect, adminOnly, upload.single('image'), async (req, res) => {
-  try {
-    if (!req.file) {
+// Uses busboy directly instead of multer to work on Vercel serverless
+router.post('/', protect, adminOnly, (req, res) => {
+  const contentType = req.headers['content-type'] || '';
+  if (!contentType.includes('multipart/form-data')) {
+    return res.status(400).json({ message: 'Must be multipart/form-data' });
+  }
+
+  const bb = Busboy({ headers: req.headers });
+  let fileBuffer = null;
+  let fileName = '';
+  let fileMime = '';
+  let uploadError = null;
+
+  bb.on('file', (fieldname, file, info) => {
+    const { filename, mimeType } = info;
+    if (!mimeType.startsWith('image/')) {
+      uploadError = 'Only image files are allowed';
+      file.resume();
+      return;
+    }
+    fileName = filename;
+    fileMime = mimeType;
+    const chunks = [];
+    file.on('data', (chunk) => chunks.push(chunk));
+    file.on('end', () => {
+      fileBuffer = Buffer.concat(chunks);
+    });
+  });
+
+  bb.on('finish', async () => {
+    if (uploadError) {
+      return res.status(400).json({ message: uploadError });
+    }
+    if (!fileBuffer) {
       return res.status(400).json({ message: 'No image file provided' });
     }
+    try {
+      const safeName = `gallery/${Date.now()}-${fileName.replace(/\s+/g, '-')}`;
+      const blob = await put(safeName, fileBuffer, {
+        access: 'public',
+        contentType: fileMime,
+      });
+      res.json({ url: blob.url });
+    } catch (err) {
+      console.error('Blob upload error:', err);
+      res.status(500).json({ message: err.message || 'Upload failed' });
+    }
+  });
 
-    const filename = `gallery/${Date.now()}-${req.file.originalname.replace(/\s+/g, '-')}`;
+  bb.on('error', (err) => {
+    console.error('Busboy error:', err);
+    res.status(500).json({ message: 'File parsing error' });
+  });
 
-    const blob = await put(filename, req.file.buffer, {
-      access: 'public',
-      contentType: req.file.mimetype,
-    });
-
-    res.json({ url: blob.url });
-  } catch (error) {
-    console.error('Upload error:', error);
-    res.status(500).json({ message: error.message || 'Upload failed' });
-  }
+  req.pipe(bb);
 });
 
 module.exports = router;

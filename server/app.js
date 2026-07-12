@@ -35,7 +35,11 @@ app.use(
   })
 );
 
-app.use(express.json());
+// Apply JSON body parser to everything EXCEPT /api/upload (which uses multipart/form-data)
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/upload')) return next();
+  express.json()(req, res, next);
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
