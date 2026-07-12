@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-// In production (Vercel), frontend and API share the same domain.
+// In production (Vercel), frontend and API share the same domain — use relative URLs (empty baseURL).
 // In local dev, the API runs on port 5000.
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
-});
+const baseURL = import.meta.env.PROD ? '' : 'http://localhost:5000';
+
+const api = axios.create({ baseURL });
 
 // Attach Bearer token from localStorage to every request
 api.interceptors.request.use(
