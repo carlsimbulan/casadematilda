@@ -1,10 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const Reservation = require('../models/Reservation');
+const Settings = require('../models/Settings');
 const { protect } = require('../middleware/authMiddleware');
 
-// Whole-property nightly rate
-const NIGHTLY_RATE = 5000; // ₱5,000 per night — adjust as needed
+const DEFAULT_NIGHTLY_RATE = 5000;
+
+async function getNightlyRate() {
+  try {
+    const setting = await Settings.findOne({ key: 'nightlyRate' });
+    return setting ? setting.value : DEFAULT_NIGHTLY_RATE;
+  } catch {
+    return DEFAULT_NIGHTLY_RATE;
+  }
+}
 
 // POST /api/reservations — create a whole-property reservation (protected)
 router.post('/', protect, async (req, res) => {
@@ -38,7 +47,8 @@ router.post('/', protect, async (req, res) => {
 
     const msPerDay = 1000 * 60 * 60 * 24;
     const nights = Math.ceil((checkOutDate - checkInDate) / msPerDay);
-    const totalPrice = NIGHTLY_RATE * nights;
+    const nightlyRate = await getNightlyRate();
+    const totalPrice = nightlyRate * nights;
 
     const reservation = await Reservation.create({
       user: req.user._id,

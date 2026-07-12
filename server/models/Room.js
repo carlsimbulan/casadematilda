@@ -4,24 +4,25 @@ const roomSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Room name is required'],
+      required: [true, 'Name is required'],
       trim: true,
     },
     description: {
       type: String,
       trim: true,
     },
+    category: {
+      type: String,
+      enum: ['rooms', 'pool', 'amenities'],
+      default: 'rooms',
+    },
     price: {
       type: Number,
-      required: [true, 'Price is required'],
+      default: 0,
     },
     capacity: {
       type: Number,
       default: 2,
-    },
-    amenities: {
-      type: [String],
-      default: [],
     },
     images: {
       type: [String],

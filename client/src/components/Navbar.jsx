@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Menu, X, ChevronDown, LogOut, User, CalendarDays, LayoutDashboard, BedDouble, ClipboardList } from 'lucide-react';
+import { Home, Menu, X, ChevronDown, LogOut, User, CalendarDays, LayoutDashboard, Images, ClipboardList } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Navbar() {
@@ -33,8 +33,8 @@ export default function Navbar() {
           {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-6">
             <Link to="/rooms" className="hover:text-amber-400 transition-colors font-medium flex items-center gap-1.5">
-              <BedDouble className="w-4 h-4" />
-              Rooms
+              <Images className="w-4 h-4" />
+              Gallery
             </Link>
             {!isAdmin && (
               <Link to="/book" className="hover:text-amber-400 transition-colors font-medium flex items-center gap-1.5">
@@ -60,7 +60,7 @@ export default function Navbar() {
                     <LayoutDashboard className="w-4 h-4" /> Dashboard
                   </Link>
                   <Link to="/admin/rooms" className="flex items-center gap-2 px-4 py-2.5 hover:bg-stone-600 transition-colors">
-                    <BedDouble className="w-4 h-4" /> Manage Rooms
+                    <Images className="w-4 h-4" /> Manage Gallery
                   </Link>
                   <Link to="/admin/reservations" className="flex items-center gap-2 px-4 py-2.5 hover:bg-stone-600 rounded-b-lg transition-colors">
                     <ClipboardList className="w-4 h-4" /> Reservations
@@ -107,7 +107,7 @@ export default function Navbar() {
       {menuOpen && (
         <div className="md:hidden bg-stone-700 border-t border-stone-600 px-4 py-4 space-y-3">
           <Link to="/rooms" onClick={closeMenu} className="flex items-center gap-2 hover:text-amber-400 transition-colors font-medium py-1">
-            <BedDouble className="w-4 h-4" /> Rooms
+            <Images className="w-4 h-4" /> Gallery
           </Link>
           {!isAdmin && (
             <Link to="/book" onClick={closeMenu} className="flex items-center gap-2 hover:text-amber-400 transition-colors font-medium py-1">
@@ -125,7 +125,7 @@ export default function Navbar() {
                 <LayoutDashboard className="w-4 h-4" /> Admin Dashboard
               </Link>
               <Link to="/admin/rooms" onClick={closeMenu} className="flex items-center gap-2 hover:text-amber-400 transition-colors font-medium py-1">
-                <BedDouble className="w-4 h-4" /> Manage Rooms
+                <Images className="w-4 h-4" /> Manage Gallery
               </Link>
               <Link to="/admin/reservations" onClick={closeMenu} className="flex items-center gap-2 hover:text-amber-400 transition-colors font-medium py-1">
                 <ClipboardList className="w-4 h-4" /> All Reservations

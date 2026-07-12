@@ -1,37 +1,72 @@
 import { useEffect, useState } from 'react';
-import { Home } from 'lucide-react';
+import { BedDouble, Waves, Star } from 'lucide-react';
 import api from '../api/axios.js';
 import RoomCard from '../components/RoomCard.jsx';
 
+const TABS = [
+  { value: 'rooms', label: 'Rooms', Icon: BedDouble },
+  { value: 'pool', label: 'Pool', Icon: Waves },
+  { value: 'amenities', label: 'Amenities', Icon: Star },
+];
+
 export default function Rooms() {
-  const [rooms, setRooms] = useState([]);
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('rooms');
 
   useEffect(() => {
-    const fetchRooms = async () => {
+    const fetchItems = async () => {
       try {
         const { data } = await api.get('/api/rooms');
-        setRooms(data);
+        setItems(data);
       } catch {
-        setError('Failed to load rooms. Please try again.');
+        setError('Failed to load content. Please try again.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRooms();
+    fetchItems();
   }, []);
+
+  const filtered = items.filter((i) => i.category === activeTab);
+
+  const activeTabInfo = TABS.find((t) => t.value === activeTab);
 
   return (
     <div className="min-h-screen bg-stone-50">
+      {/* Hero */}
       <div className="bg-stone-800 text-white py-16 text-center">
-        <h1 className="text-4xl font-bold text-amber-400 mb-3">Our Rooms</h1>
+        <h1 className="text-4xl font-bold text-amber-400 mb-3">Casa de Matilda</h1>
         <p className="text-stone-300 text-lg max-w-xl mx-auto">
-          Two private rooms included when you book the entire Casa de Matilda property.
+          Explore our rooms, pool, and amenities.
         </p>
       </div>
 
+      {/* Tabs */}
+      <div className="bg-white border-b border-stone-200 sticky top-0 z-10 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex gap-1">
+            {TABS.map(({ value, label, Icon }) => (
+              <button
+                key={value}
+                onClick={() => setActiveTab(value)}
+                className={`flex items-center gap-2 px-6 py-4 text-sm font-semibold border-b-2 transition-colors ${
+                  activeTab === value
+                    ? 'border-amber-500 text-amber-600'
+                    : 'border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {loading && (
           <div className="flex justify-center items-center py-20">
@@ -45,22 +80,22 @@ export default function Rooms() {
           </div>
         )}
 
-        {!loading && !error && rooms.length === 0 && (
+        {!loading && !error && filtered.length === 0 && (
           <div className="text-center py-20">
             <div className="flex justify-center mb-4">
               <div className="bg-stone-100 p-4 rounded-2xl">
-                <Home className="w-10 h-10 text-stone-400" />
+                {activeTabInfo && <activeTabInfo.Icon className="w-10 h-10 text-stone-400" />}
               </div>
             </div>
-            <p className="text-stone-500 text-xl">No rooms available at the moment.</p>
+            <p className="text-stone-500 text-xl">No {activeTabInfo?.label} listed yet.</p>
             <p className="text-stone-400 mt-2">Check back soon!</p>
           </div>
         )}
 
-        {!loading && rooms.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-3xl mx-auto">
-            {rooms.map((room) => (
-              <RoomCard key={room._id} room={room} />
+        {!loading && filtered.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filtered.map((item) => (
+              <RoomCard key={item._id} room={item} />
             ))}
           </div>
         )}

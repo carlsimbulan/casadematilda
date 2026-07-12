@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const roomRoutes = require('./routes/roomRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const settingsRoutes = require('./routes/settingsRoutes');
 
 // Connect to MongoDB
 connectDB();
@@ -22,6 +23,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

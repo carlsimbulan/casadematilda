@@ -5,8 +5,6 @@ import { Waves, BedDouble, UtensilsCrossed, Wifi, Wind, Music, TreePine, ShowerH
 import toast from 'react-hot-toast';
 import api from '../api/axios.js';
 
-const NIGHTLY_RATE = 5000;
-
 const AMENITIES = [
   { icon: Waves, label: 'Swimming Pool' },
   { icon: BedDouble, label: '2 Private Rooms' },
@@ -23,6 +21,7 @@ const AMENITIES = [
 export default function BookingPage() {
   const navigate = useNavigate();
 
+  const [nightlyRate, setNightlyRate] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [checkingAvailability, setCheckingAvailability] = useState(false);
   const [isAvailable, setIsAvailable] = useState(null);
@@ -33,12 +32,19 @@ export default function BookingPage() {
   const [guests, setGuests] = useState(1);
   const [specialRequests, setSpecialRequests] = useState('');
 
+  // Fetch nightly rate from the API on mount
+  useEffect(() => {
+    api.get('/api/settings/pricing')
+      .then(({ data }) => setNightlyRate(data.nightlyRate))
+      .catch(() => setNightlyRate(5000)); // fallback
+  }, []);
+
   const nights =
     checkIn && checkOut
       ? Math.max(0, differenceInCalendarDays(new Date(checkOut), new Date(checkIn)))
       : 0;
 
-  const totalPrice = NIGHTLY_RATE * nights;
+  const totalPrice = nightlyRate != null ? nightlyRate * nights : null;
 
   useEffect(() => {
     if (!checkIn || !checkOut || nights <= 0) {
@@ -205,10 +211,10 @@ export default function BookingPage() {
           </div>
 
           {/* Price Summary */}
-          {nights > 0 && (
+          {nights > 0 && nightlyRate != null && (
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-1.5">
               <div className="flex justify-between text-stone-600 text-sm">
-                <span>₱{NIGHTLY_RATE.toLocaleString()} × {nights} night{nights !== 1 ? 's' : ''}</span>
+                <span>₱{nightlyRate.toLocaleString()} × {nights} night{nights !== 1 ? 's' : ''}</span>
                 <span>₱{totalPrice.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-stone-500 text-xs">

@@ -3,10 +3,12 @@ const router = express.Router();
 const Room = require('../models/Room');
 const { protect, adminOnly } = require('../middleware/authMiddleware');
 
-// GET /api/rooms — public, list all available rooms
+// GET /api/rooms — public, list all available items (optionally filter by category)
 router.get('/', async (req, res) => {
   try {
-    const rooms = await Room.find({ isAvailable: true }).sort({ createdAt: -1 });
+    const filter = { isAvailable: true };
+    if (req.query.category) filter.category = req.query.category;
+    const rooms = await Room.find(filter).sort({ createdAt: -1 });
     res.json(rooms);
   } catch (error) {
     console.error('Get rooms error:', error);
@@ -31,18 +33,18 @@ router.get('/:id', async (req, res) => {
 // POST /api/rooms — admin only, create room
 router.post('/', protect, adminOnly, async (req, res) => {
   try {
-    const { name, description, price, capacity, amenities, images, isAvailable } = req.body;
+    const { name, description, category, price, capacity, images, isAvailable } = req.body;
 
-    if (!name || !price) {
-      return res.status(400).json({ message: 'Name and price are required' });
+    if (!name) {
+      return res.status(400).json({ message: 'Name is required' });
     }
 
     const room = await Room.create({
       name,
       description,
-      price,
+      category: category || 'rooms',
+      price: price || 0,
       capacity,
-      amenities,
       images,
       isAvailable,
     });

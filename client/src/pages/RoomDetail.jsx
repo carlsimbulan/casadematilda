@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Users, ArrowLeft, CheckCircle2, XCircle } from 'lucide-react';
+import { useParams, Link } from 'react-router-dom';
+import { ArrowLeft, XCircle } from 'lucide-react';
 import api from '../api/axios.js';
-import { useAuth } from '../context/AuthContext.jsx';
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80';
 
+const CATEGORY_LABELS = {
+  rooms: 'Rooms',
+  pool: 'Pool',
+  amenities: 'Amenities',
+};
+
 export default function RoomDetail() {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const { user } = useAuth();
 
   const [room, setRoom] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,7 +25,7 @@ export default function RoomDetail() {
         const { data } = await api.get(`/api/rooms/${id}`);
         setRoom(data);
       } catch {
-        setError('Room not found or unavailable.');
+        setError('Item not found or unavailable.');
       } finally {
         setLoading(false);
       }
@@ -43,15 +46,16 @@ export default function RoomDetail() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <XCircle className="w-12 h-12 text-stone-300" />
-        <p className="text-stone-500 text-xl">{error || 'Room not found'}</p>
+        <p className="text-stone-500 text-xl">{error || 'Not found'}</p>
         <Link to="/rooms" className="text-teal-600 hover:underline flex items-center gap-1">
-          <ArrowLeft className="w-4 h-4" /> Back to Rooms
+          <ArrowLeft className="w-4 h-4" /> Back to Gallery
         </Link>
       </div>
     );
   }
 
   const images = room.images && room.images.length > 0 ? room.images : [FALLBACK_IMAGE];
+  const categoryLabel = CATEGORY_LABELS[room.category] ?? room.category;
 
   return (
     <div className="min-h-screen bg-stone-50 py-10">
@@ -60,7 +64,7 @@ export default function RoomDetail() {
           to="/rooms"
           className="text-teal-600 hover:text-teal-700 font-medium mb-6 inline-flex items-center gap-1"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Rooms
+          <ArrowLeft className="w-4 h-4" /> Back to Gallery
         </Link>
 
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden mt-4">
@@ -97,59 +101,26 @@ export default function RoomDetail() {
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
               <div>
                 <h1 className="text-3xl font-bold text-stone-800 mb-2">{room.name}</h1>
-                <p className="text-stone-500 flex items-center gap-1.5">
-                  <Users className="w-4 h-4" />
-                  Up to {room.capacity} guest{room.capacity !== 1 ? 's' : ''}
-                </p>
-              </div>
-              <div className="text-right">
-                <div className="text-sm text-stone-400 mb-1">Included in property booking</div>
-                <div className={`inline-flex items-center gap-1.5 text-sm font-semibold px-3 py-1 rounded-full ${
-                  room.isAvailable ? 'bg-teal-100 text-teal-700' : 'bg-red-100 text-red-600'
-                }`}>
-                  {room.isAvailable
-                    ? <><CheckCircle2 className="w-4 h-4" /> Available</>
-                    : <><XCircle className="w-4 h-4" /> Unavailable</>
-                  }
-                </div>
+                <span className="inline-block text-sm font-semibold px-3 py-1 rounded-full bg-amber-100 text-amber-700 capitalize">
+                  {categoryLabel}
+                </span>
               </div>
             </div>
 
             {room.description && (
               <div className="mb-6">
-                <h2 className="text-xl font-semibold text-stone-700 mb-2">About This Room</h2>
+                <h2 className="text-xl font-semibold text-stone-700 mb-2">About</h2>
                 <p className="text-stone-600 leading-relaxed">{room.description}</p>
               </div>
             )}
 
-            {room.amenities && room.amenities.length > 0 && (
-              <div className="mb-8">
-                <h2 className="text-xl font-semibold text-stone-700 mb-3">Amenities</h2>
-                <div className="flex flex-wrap gap-2">
-                  {room.amenities.map((amenity) => (
-                    <span
-                      key={amenity}
-                      className="bg-amber-100 text-amber-800 font-medium text-sm px-3 py-1.5 rounded-full"
-                    >
-                      {amenity}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* CTA */}
-            <div className="bg-stone-50 border border-stone-200 rounded-xl p-4 text-stone-600 text-sm">
-              This room is included when you book the entire Casa de Matilda property.{' '}
-              {user ? (
-                <Link to="/book" className="text-amber-600 font-semibold hover:underline">
-                  Book the whole property
-                </Link>
-              ) : (
-                <Link to="/login" className="text-amber-600 font-semibold hover:underline">
-                  Login to book
-                </Link>
-              )}
+            <div className="mt-4">
+              <Link
+                to="/rooms"
+                className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium"
+              >
+                <ArrowLeft className="w-4 h-4" /> Back to Gallery
+              </Link>
             </div>
           </div>
         </div>

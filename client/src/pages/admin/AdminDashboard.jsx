@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BedDouble, Users, CalendarDays, Clock, CheckCircle2, XCircle, ClipboardList, LayoutDashboard } from 'lucide-react';
+import { BedDouble, Users, CalendarDays, Clock, CheckCircle2, XCircle, ClipboardList, BadgeDollarSign } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '../../api/axios.js';
 
 const StatCard = ({ icon: Icon, label, value, colorClass, iconColor }) => (
@@ -20,6 +21,11 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Pricing state
+  const [nightlyRate, setNightlyRate] = useState('');
+  const [editingRate, setEditingRate] = useState(false);
+  const [savingRate, setSavingRate] = useState(false);
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -32,8 +38,37 @@ export default function AdminDashboard() {
       }
     };
 
+    const fetchPricing = async () => {
+      try {
+        const { data } = await api.get('/api/settings/pricing');
+        setNightlyRate(data.nightlyRate);
+      } catch {
+        setNightlyRate(5000);
+      }
+    };
+
     fetchStats();
+    fetchPricing();
   }, []);
+
+  const handleSaveRate = async () => {
+    const parsed = Number(nightlyRate);
+    if (isNaN(parsed) || parsed < 0) {
+      toast.error('Please enter a valid price');
+      return;
+    }
+    setSavingRate(true);
+    try {
+      const { data } = await api.put('/api/settings/pricing', { nightlyRate: parsed });
+      setNightlyRate(data.nightlyRate);
+      setEditingRate(false);
+      toast.success('Nightly rate updated!');
+    } catch {
+      toast.error('Failed to update price');
+    } finally {
+      setSavingRate(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-stone-50 py-10">
@@ -91,6 +126,60 @@ export default function AdminDashboard() {
                   <p className="text-stone-500 text-sm">View and update booking statuses</p>
                 </div>
               </Link>
+            </div>
+
+            {/* Pricing Settings */}
+            <div className="bg-white rounded-2xl shadow-md p-6 mt-5">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-amber-100 text-amber-700 w-10 h-10 flex items-center justify-center rounded-xl">
+                    <BadgeDollarSign className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-stone-800 text-lg">Nightly Rate</h3>
+                    <p className="text-stone-500 text-sm">Price guests pay per night for the whole property</p>
+                  </div>
+                </div>
+                {!editingRate && (
+                  <button
+                    onClick={() => setEditingRate(true)}
+                    className="text-teal-600 hover:text-teal-800 font-medium text-sm border border-teal-200 hover:border-teal-400 px-4 py-1.5 rounded-lg transition-colors"
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
+
+              {editingRate ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-stone-500 font-medium">₱</span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={nightlyRate}
+                    onChange={(e) => setNightlyRate(e.target.value)}
+                    className="flex-1 border border-stone-300 rounded-xl px-4 py-2.5 text-stone-800 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  />
+                  <button
+                    onClick={handleSaveRate}
+                    disabled={savingRate}
+                    className="bg-amber-500 hover:bg-amber-600 disabled:bg-stone-300 text-stone-900 font-semibold px-5 py-2.5 rounded-xl transition-colors"
+                  >
+                    {savingRate ? 'Saving...' : 'Save'}
+                  </button>
+                  <button
+                    onClick={() => setEditingRate(false)}
+                    className="border border-stone-300 text-stone-600 hover:bg-stone-50 font-semibold px-4 py-2.5 rounded-xl transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <div className="text-3xl font-bold text-amber-600">
+                  ₱{nightlyRate !== '' ? Number(nightlyRate).toLocaleString() : '—'}
+                  <span className="text-stone-400 text-base font-normal ml-2">/ night</span>
+                </div>
+              )}
             </div>
           </>
         )}
