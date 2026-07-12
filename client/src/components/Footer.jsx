@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { Home, Mail, Phone, MapPin } from 'lucide-react';
+import ProtectedLink from './ProtectedLink.jsx';
+import { Home, Mail, MapPin, Instagram, Facebook } from 'lucide-react';
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -30,7 +31,7 @@ export default function Footer() {
                 <Link to="/rooms" className="hover:text-amber-400 transition-colors">Browse Rooms</Link>
               </li>
               <li>
-                <Link to="/my-reservations" className="hover:text-amber-400 transition-colors">My Reservations</Link>
+                <ProtectedLink to="/my-reservations" className="hover:text-amber-400 transition-colors">My Reservations</ProtectedLink>
               </li>
             </ul>
           </div>
@@ -38,15 +39,41 @@ export default function Footer() {
           {/* Contact */}
           <div>
             <h3 className="text-amber-400 font-semibold mb-3">Contact</h3>
-            <ul className="space-y-2 text-sm text-stone-400">
-              <li className="flex items-center gap-2">
-                <Mail className="w-4 h-4 flex-shrink-0" /> hello@casamatilda.com
+            <ul className="space-y-3 text-sm text-stone-400">
+              <li className="flex items-start gap-2">
+                <Mail className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <a
+                  href="mailto:casadematilda.stay@gmail.com"
+                  className="hover:text-amber-400 transition-colors"
+                >
+                  casadematilda.stay@gmail.com
+                </a>
+              </li>
+              <li className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <span>015 Purok 1 Biglang Liko Street, Silang, Philippines, 4118</span>
               </li>
               <li className="flex items-center gap-2">
-                <Phone className="w-4 h-4 flex-shrink-0" /> +63 (912) 345-6789
+                <Instagram className="w-4 h-4 flex-shrink-0" />
+                <a
+                  href="https://www.instagram.com/casade.matilda"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-amber-400 transition-colors"
+                >
+                  @casade.matilda
+                </a>
               </li>
               <li className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 flex-shrink-0" /> Cavite, Philippines
+                <Facebook className="w-4 h-4 flex-shrink-0" />
+                <a
+                  href="https://www.facebook.com/casadematilda.stay"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-amber-400 transition-colors"
+                >
+                  Casa de Matilda
+                </a>
               </li>
             </ul>
           </div>

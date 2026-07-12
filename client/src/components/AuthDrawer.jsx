@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../api/axios.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function AuthDrawer({ isOpen, onClose, initialMode = 'login' }) {
-  const { login } = useAuth();
+  const { login, authReturnUrl } = useAuth();
+  const navigate = useNavigate();
   const [mode, setMode] = useState(initialMode);
 
   // Login state
@@ -40,14 +42,20 @@ export default function AuthDrawer({ isOpen, onClose, initialMode = 'login' }) {
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
+  const handleAuthSuccess = (token, userData, message) => {
+    login(token, userData);
+    toast.success(message);
+    const returnTo = authReturnUrl;
+    onClose();
+    if (returnTo) navigate(returnTo);
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const { data } = await api.post('/api/auth/login', { email, password });
-      login(data.token, data.user);
-      toast.success(`Welcome back, ${data.user.name.split(' ')[0]}!`);
-      onClose();
+      handleAuthSuccess(data.token, data.user, `Welcome back, ${data.user.name.split(' ')[0]}!`);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {
@@ -64,9 +72,7 @@ export default function AuthDrawer({ isOpen, onClose, initialMode = 'login' }) {
     setLoading(true);
     try {
       const { data } = await api.post('/api/auth/register', { name, email: regEmail, password: regPassword });
-      login(data.token, data.user);
-      toast.success(`Welcome to Casa de Matilda, ${data.user.name.split(' ')[0]}!`);
-      onClose();
+      handleAuthSuccess(data.token, data.user, `Welcome to Casa de Matilda, ${data.user.name.split(' ')[0]}!`);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
@@ -76,39 +82,22 @@ export default function AuthDrawer({ isOpen, onClose, initialMode = 'login' }) {
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Drawer panel — no backdrop overlay */}
       <div
-        className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        onClick={onClose}
-      />
-
-      {/* Drawer */}
-      <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-96 bg-white z-50 shadow-2xl flex flex-col transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`fixed top-16 right-0 h-[calc(100%-4rem)] w-full sm:w-96 bg-white z-40 shadow-2xl flex flex-col transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'}`}
+        aria-hidden={!isOpen}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-stone-200 bg-stone-800">
-          <div className="flex gap-1">
-            <button
-              onClick={() => setMode('login')}
-              className={`px-4 py-1.5 rounded-xl text-sm font-semibold transition-colors ${mode === 'login' ? 'bg-amber-500 text-stone-900' : 'text-amber-100 hover:text-amber-400'}`}
-            >
-              Sign In
-            </button>
-            <button
-              onClick={() => setMode('register')}
-              className={`px-4 py-1.5 rounded-xl text-sm font-semibold transition-colors ${mode === 'register' ? 'bg-amber-500 text-stone-900' : 'text-amber-100 hover:text-amber-400'}`}
-            >
-              Register
+        {/* Body */}
+        <div className="flex-grow overflow-y-auto px-6 py-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-stone-800">
+              {mode === 'login' ? 'Sign In' : 'Create Account'}
+            </h2>
+            <button onClick={onClose} className="text-stone-400 hover:text-stone-700 p-1 rounded-lg transition-colors">
+              <X className="w-5 h-5" />
             </button>
           </div>
-          <button onClick={onClose} className="text-amber-100 hover:text-white p-1 rounded-lg transition-colors">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
 
-        {/* Body */}
-        <div className="flex-grow overflow-y-auto px-6 py-8">
           {mode === 'login' ? (
             <form onSubmit={handleLogin} className="space-y-5">
               <div>

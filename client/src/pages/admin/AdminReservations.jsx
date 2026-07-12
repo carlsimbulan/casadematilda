@@ -2,12 +2,22 @@ import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import api from '../../api/axios.js';
+import { filterReservations, isHistory } from '../../utils/reservationFilters.js';
 
 const STATUS_STYLES = {
   pending: 'bg-amber-100 text-amber-800',
   confirmed: 'bg-teal-100 text-teal-800',
   cancelled: 'bg-stone-200 text-stone-600',
 };
+
+const FILTERS = [
+  { id: 'all', label: 'All' },
+  { id: 'upcoming', label: 'Upcoming' },
+  { id: 'history', label: 'History' },
+  { id: 'pending', label: 'Pending' },
+  { id: 'confirmed', label: 'Confirmed' },
+  { id: 'cancelled', label: 'Cancelled' },
+];
 
 export default function AdminReservations() {
   const [reservations, setReservations] = useState([]);
@@ -43,34 +53,33 @@ export default function AdminReservations() {
     }
   };
 
-  const filtered =
-    filter === 'all' ? reservations : reservations.filter((r) => r.status === filter);
+  const filtered = filterReservations(reservations, filter);
 
   return (
     <div className="min-h-screen bg-stone-50 py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-stone-800">All Reservations</h1>
-          <p className="text-stone-500 mt-1">Review and manage guest bookings for Casa de Matilda.</p>
+          <p className="text-stone-500 mt-1">
+            Review upcoming bookings, past stay history, and manage guest reservations.
+          </p>
         </div>
 
-        {/* Filter Tabs */}
         <div className="flex gap-2 mb-6 flex-wrap">
-          {['all', 'pending', 'confirmed', 'cancelled'].map((status) => (
+          {FILTERS.map(({ id, label }) => (
             <button
-              key={status}
-              onClick={() => setFilter(status)}
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold capitalize transition-colors ${
-                filter === status
+              key={id}
+              onClick={() => setFilter(id)}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${
+                filter === id
                   ? 'bg-stone-800 text-white'
                   : 'bg-white text-stone-600 hover:bg-stone-100 border border-stone-200'
               }`}
             >
-              {status}
-              {status !== 'all' && (
+              {label}
+              {id !== 'all' && (
                 <span className="ml-1.5 text-xs opacity-70">
-                  ({reservations.filter((r) => r.status === status).length})
+                  ({filterReservations(reservations, id).length})
                 </span>
               )}
             </button>
@@ -92,13 +101,14 @@ export default function AdminReservations() {
                     <th className="px-5 py-3 text-left">Dates</th>
                     <th className="px-5 py-3 text-left">Guests</th>
                     <th className="px-5 py-3 text-left">Total</th>
+                    <th className="px-5 py-3 text-left">Booked</th>
                     <th className="px-5 py-3 text-left">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
                   {filtered.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="text-center py-10 text-stone-400">
+                      <td colSpan={7} className="text-center py-10 text-stone-400">
                         No reservations found.
                       </td>
                     </tr>
@@ -114,6 +124,9 @@ export default function AdminReservations() {
                         <td className="px-5 py-4">
                           <div className="font-medium text-stone-700">Casa de Matilda</div>
                           <div className="text-stone-400 text-xs">Entire property · 2 rooms + pool</div>
+                          {isHistory(res) && (
+                            <div className="text-stone-500 text-xs mt-1 font-medium">Past stay</div>
+                          )}
                         </td>
                         <td className="px-5 py-4 text-stone-600">
                           <div>{format(new Date(res.checkIn), 'MMM d, yyyy')}</div>
@@ -122,6 +135,9 @@ export default function AdminReservations() {
                         <td className="px-5 py-4 text-stone-600">{res.guests}</td>
                         <td className="px-5 py-4 font-semibold text-amber-600">
                           ₱{res.totalPrice?.toLocaleString()}
+                        </td>
+                        <td className="px-5 py-4 text-stone-500 text-xs">
+                          {format(new Date(res.createdAt), 'MMM d, yyyy')}
                         </td>
                         <td className="px-5 py-4">
                           <select

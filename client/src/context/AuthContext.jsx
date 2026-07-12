@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback } from 'react';
+import AuthDrawer from '../components/AuthDrawer.jsx';
 
 const AuthContext = createContext(null);
 
@@ -12,6 +13,10 @@ export function AuthProvider({ children }) {
     }
   });
 
+  const [authDrawerOpen, setAuthDrawerOpen] = useState(false);
+  const [authDrawerMode, setAuthDrawerMode] = useState('login');
+  const [authReturnUrl, setAuthReturnUrl] = useState(null);
+
   const login = useCallback((token, userData) => {
     localStorage.setItem('cdm_token', token);
     localStorage.setItem('cdm_user', JSON.stringify(userData));
@@ -24,11 +29,35 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
+  const openAuthDrawer = useCallback((mode = 'login', returnUrl = null) => {
+    setAuthDrawerMode(mode);
+    setAuthReturnUrl(returnUrl);
+    setAuthDrawerOpen(true);
+  }, []);
+
+  const closeAuthDrawer = useCallback(() => {
+    setAuthDrawerOpen(false);
+    setAuthReturnUrl(null);
+  }, []);
+
   const isAdmin = user?.role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAdmin }}>
+    <AuthContext.Provider value={{
+      user,
+      login,
+      logout,
+      isAdmin,
+      openAuthDrawer,
+      closeAuthDrawer,
+      authReturnUrl,
+    }}>
       {children}
+      <AuthDrawer
+        isOpen={authDrawerOpen}
+        onClose={closeAuthDrawer}
+        initialMode={authDrawerMode}
+      />
     </AuthContext.Provider>
   );
 }

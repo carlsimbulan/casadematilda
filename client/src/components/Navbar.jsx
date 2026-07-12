@@ -1,16 +1,14 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import ProtectedLink from './ProtectedLink.jsx';
 import { Menu, X, ChevronDown, LogOut, User, CalendarDays, LayoutDashboard, Images, ClipboardList } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import logo from '../assets/logo.png';
-import AuthDrawer from './AuthDrawer.jsx';
 
 export default function Navbar() {
-  const { user, isAdmin, logout } = useAuth();
+  const { user, isAdmin, logout, openAuthDrawer } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerMode, setDrawerMode] = useState('login');
 
   const handleLogout = () => {
     logout();
@@ -20,15 +18,13 @@ export default function Navbar() {
 
   const closeMenu = () => setMenuOpen(false);
 
-  const openDrawer = (mode = 'login') => {
-    setDrawerMode(mode);
-    setDrawerOpen(true);
+  const handleOpenAuth = (mode = 'login') => {
+    openAuthDrawer(mode);
     setMenuOpen(false);
   };
 
   return (
-    <>
-    <nav className="bg-stone-800 text-amber-100 shadow-lg">
+    <nav className="relative z-50 bg-stone-800 text-amber-100 shadow-lg">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -47,10 +43,10 @@ export default function Navbar() {
               Gallery
             </Link>
             {!isAdmin && (
-              <Link to="/book" className="hover:text-amber-400 transition-colors font-medium flex items-center gap-1.5">
+              <ProtectedLink to="/book" className="hover:text-amber-400 transition-colors font-medium flex items-center gap-1.5">
                 <CalendarDays className="w-4 h-4" />
                 Book Now
-              </Link>
+              </ProtectedLink>
             )}
             {user && !isAdmin && (
               <Link to="/my-reservations" className="hover:text-amber-400 transition-colors font-medium flex items-center gap-1.5">
@@ -92,10 +88,10 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                <button onClick={() => openDrawer('login')} className="hover:text-amber-400 transition-colors font-medium">
+                <button onClick={() => handleOpenAuth('login')} className="hover:text-amber-400 transition-colors font-medium">
                   Login
                 </button>
-                <button onClick={() => openDrawer('register')} className="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-4 py-1.5 rounded-lg transition-colors">
+                <button onClick={() => handleOpenAuth('register')} className="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-4 py-1.5 rounded-lg transition-colors">
                   Register
                 </button>
               </div>
@@ -120,9 +116,9 @@ export default function Navbar() {
             <Images className="w-4 h-4" /> Gallery
           </Link>
           {!isAdmin && (
-            <Link to="/book" onClick={closeMenu} className="flex items-center gap-2 hover:text-amber-400 transition-colors font-medium py-1">
+            <ProtectedLink to="/book" onClick={closeMenu} className="flex items-center gap-2 hover:text-amber-400 transition-colors font-medium py-1">
               <CalendarDays className="w-4 h-4" /> Book Now
-            </Link>
+            </ProtectedLink>
           )}
           {user && !isAdmin && (
             <Link to="/my-reservations" onClick={closeMenu} className="flex items-center gap-2 hover:text-amber-400 transition-colors font-medium py-1">
@@ -157,10 +153,10 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="space-y-2">
-                <button onClick={() => openDrawer('login')} className="block w-full text-center border border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-stone-900 font-semibold px-4 py-2 rounded-lg transition-colors">
+                <button onClick={() => handleOpenAuth('login')} className="block w-full text-center border border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-stone-900 font-semibold px-4 py-2 rounded-lg transition-colors">
                   Login
                 </button>
-                <button onClick={() => openDrawer('register')} className="block w-full text-center bg-teal-600 hover:bg-teal-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
+                <button onClick={() => handleOpenAuth('register')} className="block w-full text-center bg-teal-600 hover:bg-teal-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
                   Register
                 </button>
               </div>
@@ -169,7 +165,5 @@ export default function Navbar() {
         </div>
       )}
     </nav>
-    <AuthDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} initialMode={drawerMode} />
-    </>
   );
 }

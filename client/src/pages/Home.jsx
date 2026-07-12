@@ -1,3 +1,4 @@
+import ProtectedLink from '../components/ProtectedLink.jsx';
 import { Link } from 'react-router-dom';
 import { BedDouble, Lock, Leaf } from 'lucide-react';
 import bgCasa from '../assets/bgcasa.png';
@@ -49,12 +50,12 @@ export default function Home() {
             us take care of the rest.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
+            <ProtectedLink
               to="/book"
               className="bg-amber-500 hover:bg-amber-600 text-stone-900 font-bold text-lg px-8 py-4 rounded-2xl transition-colors shadow-lg"
             >
               Book Now
-            </Link>
+            </ProtectedLink>
             <Link
               to="/rooms"
               className="border-2 border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-stone-900 font-bold text-lg px-8 py-4 rounded-2xl transition-colors"
@@ -110,12 +111,12 @@ export default function Home() {
             Reserve the entire Casa de Matilda — 2 private rooms, swimming pool, and all amenities
             exclusively for your group.
           </p>
-          <Link
+          <ProtectedLink
             to="/book"
             className="inline-block bg-amber-400 hover:bg-amber-500 text-stone-900 font-bold text-lg px-10 py-4 rounded-2xl transition-colors shadow-lg"
           >
             Reserve the Whole Property
-          </Link>
+          </ProtectedLink>
         </div>
       </section>
 
