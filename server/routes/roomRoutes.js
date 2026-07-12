@@ -1,7 +1,19 @@
 const express = require('express');
 const router = express.Router();
+const { del } = require('@vercel/blob');
 const Room = require('../models/Room');
 const { protect, adminOnly } = require('../middleware/authMiddleware');
+
+// Helper — delete an array of Vercel Blob URLs (ignores errors so it never blocks the main op)
+const deleteBlobUrls = async (urls = []) => {
+  const blobUrls = urls.filter((u) => u && u.includes('vercel-storage.com'));
+  if (!blobUrls.length) return;
+  try {
+    await del(blobUrls);
+  } catch (err) {
+    console.error('Blob delete error (non-fatal):', err.message);
+  }
+};
 
 // GET /api/rooms — public, list all available items (optionally filter by category)
 router.get('/', async (req, res) => {
@@ -57,12 +69,21 @@ router.post('/', protect, adminOnly, async (req, res) => {
 });
 
 // PUT /api/rooms/:id — admin only, update room
+// Auto-deletes removed images from Vercel Blob
 router.put('/:id', protect, adminOnly, async (req, res) => {
   try {
     const room = await Room.findById(req.params.id);
     if (!room) {
       return res.status(404).json({ message: 'Room not found' });
     }
+
+    // Find images that were removed (in old list but not in new list)
+    const oldImages = room.images || [];
+    const newImages = req.body.images || [];
+    const removedImages = oldImages.filter((url) => !newImages.includes(url));
+
+    // Delete removed images from Blob storage
+    await deleteBlobUrls(removedImages);
 
     const updatedRoom = await Room.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -76,13 +97,16 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
   }
 });
 
-// DELETE /api/rooms/:id — admin only, delete room
+// DELETE /api/rooms/:id — admin only, delete room + its blob images
 router.delete('/:id', protect, adminOnly, async (req, res) => {
   try {
     const room = await Room.findById(req.params.id);
     if (!room) {
       return res.status(404).json({ message: 'Room not found' });
     }
+
+    // Delete all images from Blob storage first
+    await deleteBlobUrls(room.images);
 
     await Room.findByIdAndDelete(req.params.id);
     res.json({ message: 'Room deleted successfully' });
