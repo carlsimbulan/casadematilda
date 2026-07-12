@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { BedDouble, Lock, Leaf } from 'lucide-react';
 import bgCasa from '../assets/bgcasa.png';
+import readyToEsc from '../assets/readytoesc.png';
 
 const features = [
   {
@@ -100,7 +101,7 @@ export default function Home() {
         className="py-20 text-center"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(13,148,136,0.88), rgba(13,148,136,0.88)), url(/readytoesc.png)',
+            'linear-gradient(rgba(13,148,136,0.88), rgba(13,148,136,0.88)), url(' + readyToEsc + ')',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
