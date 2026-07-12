@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Menu, X, ChevronDown, LogOut, User, CalendarDays, LayoutDashboard, Images, ClipboardList } from 'lucide-react';
+import { Menu, X, ChevronDown, LogOut, User, CalendarDays, LayoutDashboard, Images, ClipboardList } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
+import logo from '../assets/logo.png';
+import AuthDrawer from './AuthDrawer.jsx';
 
 export default function Navbar() {
   const { user, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerMode, setDrawerMode] = useState('login');
 
   const handleLogout = () => {
     logout();
@@ -16,18 +20,24 @@ export default function Navbar() {
 
   const closeMenu = () => setMenuOpen(false);
 
+  const openDrawer = (mode = 'login') => {
+    setDrawerMode(mode);
+    setDrawerOpen(true);
+    setMenuOpen(false);
+  };
+
   return (
+    <>
     <nav className="bg-stone-800 text-amber-100 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link
             to="/"
-            className="flex items-center gap-2 font-bold text-xl text-amber-400 hover:text-amber-300 transition-colors"
+            className="flex items-center hover:opacity-80 transition-opacity"
             onClick={closeMenu}
           >
-            <Home className="w-6 h-6" />
-            <span>Casa de Matilda</span>
+            <img src={logo} alt="Casa de Matilda" className="h-10 w-auto object-contain" />
           </Link>
 
           {/* Desktop Links */}
@@ -82,12 +92,12 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                <Link to="/login" className="hover:text-amber-400 transition-colors font-medium">
+                <button onClick={() => openDrawer('login')} className="hover:text-amber-400 transition-colors font-medium">
                   Login
-                </Link>
-                <Link to="/register" className="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-4 py-1.5 rounded-lg transition-colors">
+                </button>
+                <button onClick={() => openDrawer('register')} className="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-4 py-1.5 rounded-lg transition-colors">
                   Register
-                </Link>
+                </button>
               </div>
             )}
           </div>
@@ -147,17 +157,19 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="space-y-2">
-                <Link to="/login" onClick={closeMenu} className="block text-center border border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-stone-900 font-semibold px-4 py-2 rounded-lg transition-colors">
+                <button onClick={() => openDrawer('login')} className="block w-full text-center border border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-stone-900 font-semibold px-4 py-2 rounded-lg transition-colors">
                   Login
-                </Link>
-                <Link to="/register" onClick={closeMenu} className="block text-center bg-teal-600 hover:bg-teal-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
+                </button>
+                <button onClick={() => openDrawer('register')} className="block w-full text-center bg-teal-600 hover:bg-teal-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
                   Register
-                </Link>
+                </button>
               </div>
             )}
           </div>
         </div>
       )}
     </nav>
+    <AuthDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} initialMode={drawerMode} />
+    </>
   );
 }

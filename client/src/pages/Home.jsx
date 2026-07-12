@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { BedDouble, Lock, Leaf } from 'lucide-react';
 import bgCasa from '../assets/bgcasa.png';
 import readyToEsc from '../assets/readytoesc.png';
+import logo from '../assets/logo.png';
 
 const features = [
   {
@@ -37,12 +38,9 @@ export default function Home() {
         }}
       >
         <div className="max-w-3xl mx-auto px-6">
-          <p className="text-amber-400 font-semibold text-lg mb-3 tracking-widest uppercase">
-            Welcome to
-          </p>
-          <h1 className="text-5xl sm:text-7xl font-bold text-white mb-6 leading-tight">
-            Casa de Matilda
-          </h1>
+          <div className="flex justify-center mb-6">
+            <img src={logo} alt="Casa de Matilda" className="h-40 sm:h-52 object-contain drop-shadow-2xl" />
+          </div>
           <p className="text-xl sm:text-2xl text-amber-100 mb-10 leading-relaxed">
             Your Perfect Staycation Escape
           </p>
