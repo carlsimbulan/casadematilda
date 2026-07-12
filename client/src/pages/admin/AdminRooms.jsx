@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { X, Upload, ImagePlus, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../api/axios.js';
 
@@ -13,7 +13,6 @@ const EMPTY_FORM = {
   name: '',
   description: '',
   category: 'rooms',
-  images: '',
 };
 
 export default function AdminRooms() {
@@ -23,7 +22,12 @@ export default function AdminRooms() {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
+  // imageUrls = already-saved URLs; pendingFiles = new File objects picked but not yet uploaded
+  const [imageUrls, setImageUrls] = useState([]);
+  const [pendingFiles, setPendingFiles] = useState([]);
+  const [pendingPreviews, setPendingPreviews] = useState([]);
   const [saving, setSaving] = useState(false);
+  const fileInputRef = useRef(null);
 
   const fetchItems = async () => {
     try {
@@ -46,6 +50,9 @@ export default function AdminRooms() {
   const openAdd = () => {
     setEditing(null);
     setForm({ ...EMPTY_FORM, category: activeTab === 'all' ? 'rooms' : activeTab });
+    setImageUrls([]);
+    setPendingFiles([]);
+    setPendingPreviews([]);
     setShowModal(true);
   };
 
@@ -55,9 +62,37 @@ export default function AdminRooms() {
       name: item.name,
       description: item.description || '',
       category: item.category || 'rooms',
-      images: (item.images || []).join(', '),
     });
+    setImageUrls(item.images || []);
+    setPendingFiles([]);
+    setPendingPreviews([]);
     setShowModal(true);
+  };
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+
+    const validFiles = files.filter((f) => f.type.startsWith('image/'));
+    if (validFiles.length !== files.length) {
+      toast.error('Only image files are allowed');
+    }
+
+    const previews = validFiles.map((f) => URL.createObjectURL(f));
+    setPendingFiles((prev) => [...prev, ...validFiles]);
+    setPendingPreviews((prev) => [...prev, ...previews]);
+    // Reset input so same file can be picked again
+    e.target.value = '';
+  };
+
+  const removePending = (idx) => {
+    URL.revokeObjectURL(pendingPreviews[idx]);
+    setPendingFiles((prev) => prev.filter((_, i) => i !== idx));
+    setPendingPreviews((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const removeExisting = (idx) => {
+    setImageUrls((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const handleDelete = async (id) => {
@@ -71,21 +106,36 @@ export default function AdminRooms() {
     }
   };
 
+  const uploadPendingFiles = async () => {
+    const uploaded = [];
+    for (const file of pendingFiles) {
+      const formData = new FormData();
+      formData.append('image', file);
+      const { data } = await api.post('/api/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      uploaded.push(data.url);
+    }
+    return uploaded;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
 
-    const payload = {
-      name: form.name,
-      description: form.description,
-      category: form.category,
-      images: form.images
-        ? form.images.split(',').map((i) => i.trim()).filter(Boolean)
-        : [],
-      isAvailable: true,
-    };
-
     try {
+      // Upload any new files first
+      const newUrls = pendingFiles.length > 0 ? await uploadPendingFiles() : [];
+      const allImages = [...imageUrls, ...newUrls];
+
+      const payload = {
+        name: form.name,
+        description: form.description,
+        category: form.category,
+        images: allImages,
+        isAvailable: true,
+      };
+
       if (editing) {
         await api.put(`/api/rooms/${editing}`, payload);
         toast.success('Updated');
@@ -119,7 +169,7 @@ export default function AdminRooms() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-stone-800">Manage Gallery</h1>
-            <p className="text-stone-500 mt-1">Post pictures with names and descriptions for Rooms, Pool, or Amenities.</p>
+            <p className="text-stone-500 mt-1">Upload photos for Rooms, Pool, or Amenities.</p>
           </div>
           <button
             onClick={openAdd}
@@ -272,16 +322,77 @@ export default function AdminRooms() {
 
               {/* Images */}
               <div>
-                <label className="block text-stone-700 font-medium mb-1 text-sm">
-                  Image URLs <span className="text-stone-400 font-normal">(comma-separated)</span>
-                </label>
+                <label className="block text-stone-700 font-medium mb-2 text-sm">Photos</label>
+
+                {/* Existing saved images */}
+                {imageUrls.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {imageUrls.map((url, idx) => (
+                      <div key={idx} className="relative group w-20 h-20">
+                        <img
+                          src={url}
+                          alt={`Image ${idx + 1}`}
+                          className="w-20 h-20 object-cover rounded-xl border border-stone-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeExisting(idx)}
+                          className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Pending new images (not yet uploaded) */}
+                {pendingPreviews.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {pendingPreviews.map((src, idx) => (
+                      <div key={idx} className="relative group w-20 h-20">
+                        <img
+                          src={src}
+                          alt={`New ${idx + 1}`}
+                          className="w-20 h-20 object-cover rounded-xl border-2 border-dashed border-amber-400"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removePending(idx)}
+                          className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                        <div className="absolute bottom-0 inset-x-0 bg-amber-500/80 text-white text-[10px] text-center py-0.5 rounded-b-xl">
+                          pending
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Upload button */}
                 <input
-                  type="text"
-                  value={form.images}
-                  onChange={(e) => setForm({ ...form, images: e.target.value })}
-                  placeholder="https://example.com/photo1.jpg, https://..."
-                  className="w-full border border-stone-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleFileChange}
                 />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-stone-300 hover:border-teal-400 text-stone-500 hover:text-teal-600 rounded-xl text-sm font-medium transition-colors w-full justify-center"
+                >
+                  <ImagePlus className="w-4 h-4" />
+                  {imageUrls.length + pendingPreviews.length === 0
+                    ? 'Click to upload photos'
+                    : 'Add more photos'}
+                </button>
+                <p className="text-xs text-stone-400 mt-1.5">
+                  JPG, PNG, WebP — max 10 MB each. Images will upload when you save.
+                </p>
               </div>
 
               <div className="flex gap-3 pt-2">
@@ -295,9 +406,16 @@ export default function AdminRooms() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 bg-amber-500 hover:bg-amber-600 disabled:bg-stone-300 text-stone-900 font-semibold py-2.5 rounded-xl transition-colors"
+                  className="flex-1 bg-amber-500 hover:bg-amber-600 disabled:bg-stone-300 text-stone-900 font-semibold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2"
                 >
-                  {saving ? 'Saving...' : editing ? 'Save Changes' : 'Create'}
+                  {saving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-stone-600 border-t-transparent" />
+                      {pendingFiles.length > 0 ? 'Uploading...' : 'Saving...'}
+                    </>
+                  ) : (
+                    <>{editing ? 'Save Changes' : 'Create'}</>
+                  )}
                 </button>
               </div>
             </form>
