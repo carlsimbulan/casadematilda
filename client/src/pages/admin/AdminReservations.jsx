@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
+import { History } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../api/axios.js';
-import { filterReservations, isHistory } from '../../utils/reservationFilters.js';
+import { filterReservations } from '../../utils/reservationFilters.js';
 
 const STATUS_STYLES = {
   pending: 'bg-amber-100 text-amber-800',
@@ -13,7 +14,6 @@ const STATUS_STYLES = {
 const FILTERS = [
   { id: 'all', label: 'All' },
   { id: 'upcoming', label: 'Upcoming' },
-  { id: 'history', label: 'History' },
   { id: 'pending', label: 'Pending' },
   { id: 'confirmed', label: 'Confirmed' },
   { id: 'cancelled', label: 'Cancelled' },
@@ -56,15 +56,8 @@ export default function AdminReservations() {
   const filtered = filterReservations(reservations, filter);
 
   return (
-    <div className="min-h-screen bg-stone-50 py-10">
+    <div className="bg-stone-50 py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-stone-800">All Reservations</h1>
-          <p className="text-stone-500 mt-1">
-            Review upcoming bookings, past stay history, and manage guest reservations.
-          </p>
-        </div>
-
         <div className="flex gap-2 mb-6 flex-wrap">
           {FILTERS.map(({ id, label }) => (
             <button
@@ -124,9 +117,6 @@ export default function AdminReservations() {
                         <td className="px-5 py-4">
                           <div className="font-medium text-stone-700">Casa de Matilda</div>
                           <div className="text-stone-400 text-xs">Entire property · 2 rooms + pool</div>
-                          {isHistory(res) && (
-                            <div className="text-stone-500 text-xs mt-1 font-medium">Past stay</div>
-                          )}
                         </td>
                         <td className="px-5 py-4 text-stone-600">
                           <div>{format(new Date(res.checkIn), 'MMM d, yyyy')}</div>

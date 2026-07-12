@@ -99,7 +99,7 @@ export default function BookingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 py-12">
+    <div className="bg-stone-50 py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
         <h1 className="text-3xl font-bold text-stone-800 mb-1">Book Casa de Matilda</h1>
         <p className="text-stone-500 mb-8">Reserve the entire property exclusively for your group.</p>

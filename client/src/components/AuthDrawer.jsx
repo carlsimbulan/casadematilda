@@ -47,7 +47,11 @@ export default function AuthDrawer({ isOpen, onClose, initialMode = 'login' }) {
     toast.success(message);
     const returnTo = authReturnUrl;
     onClose();
-    if (returnTo) navigate(returnTo);
+    if (returnTo) {
+      navigate(returnTo);
+    } else {
+      navigate(userData.role === 'admin' ? '/admin' : '/dashboard');
+    }
   };
 
   const handleLogin = async (e) => {

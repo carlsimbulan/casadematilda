@@ -36,7 +36,7 @@ export default function RoomDetail() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex justify-center items-center py-24">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-amber-500 border-t-transparent"></div>
       </div>
     );
@@ -44,7 +44,7 @@ export default function RoomDetail() {
 
   if (error || !room) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+      <div className="flex flex-col items-center justify-center gap-4 py-24">
         <XCircle className="w-12 h-12 text-stone-300" />
         <p className="text-stone-500 text-xl">{error || 'Not found'}</p>
         <Link to="/rooms" className="text-teal-600 hover:underline flex items-center gap-1">
@@ -58,7 +58,7 @@ export default function RoomDetail() {
   const categoryLabel = CATEGORY_LABELS[room.category] ?? room.category;
 
   return (
-    <div className="min-h-screen bg-stone-50 py-10">
+    <div className="bg-stone-50 py-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link
           to="/rooms"
