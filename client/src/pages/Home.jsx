@@ -100,7 +100,7 @@ export default function Home() {
         className="py-20 text-center"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(13,148,136,0.88), rgba(13,148,136,0.88)), url(https://images.unsplash.com/photo-1540518614846-7eded433c457?w=1600&q=80)',
+            'linear-gradient(rgba(13,148,136,0.88), rgba(13,148,136,0.88)), url(/readytoesc.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
