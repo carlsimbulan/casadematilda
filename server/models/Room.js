@@ -13,8 +13,8 @@ const roomSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ['rooms', 'pool', 'amenities'],
-      default: 'rooms',
+      enum: ['inside', 'outside'],
+      default: 'inside',
     },
     price: {
       type: Number,

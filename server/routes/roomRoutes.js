@@ -54,7 +54,7 @@ router.post('/', protect, adminOnly, async (req, res) => {
     const room = await Room.create({
       name,
       description,
-      category: category || 'rooms',
+      category: category || 'inside',
       price: price || 0,
       capacity,
       images,

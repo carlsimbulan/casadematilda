@@ -3,9 +3,8 @@ import { Link } from 'react-router-dom';
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80';
 
 const CATEGORY_COLORS = {
-  rooms: 'bg-teal-100 text-teal-700',
-  pool: 'bg-blue-100 text-blue-700',
-  amenities: 'bg-amber-100 text-amber-700',
+  inside: 'bg-teal-100 text-teal-700',
+  outside: 'bg-green-100 text-green-700',
 };
 
 export default function RoomCard({ room }) {

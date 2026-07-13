@@ -4,15 +4,14 @@ import toast from 'react-hot-toast';
 import api from '../../api/axios.js';
 
 const CATEGORIES = [
-  { value: 'rooms', label: 'Rooms' },
-  { value: 'pool', label: 'Pool' },
-  { value: 'amenities', label: 'Amenities' },
+  { value: 'inside', label: 'Inside' },
+  { value: 'outside', label: 'Outside' },
 ];
 
 const EMPTY_FORM = {
   name: '',
   description: '',
-  category: 'rooms',
+  category: 'inside',
 };
 
 export default function AdminRooms() {
@@ -49,7 +48,7 @@ export default function AdminRooms() {
 
   const openAdd = () => {
     setEditing(null);
-    setForm({ ...EMPTY_FORM, category: activeTab === 'all' ? 'rooms' : activeTab });
+    setForm({ ...EMPTY_FORM, category: activeTab === 'all' ? 'inside' : activeTab });
     setImageUrls([]);
     setPendingFiles([]);
     setPendingPreviews([]);
@@ -61,7 +60,7 @@ export default function AdminRooms() {
     setForm({
       name: item.name,
       description: item.description || '',
-      category: item.category || 'rooms',
+      category: item.category || 'inside',
     });
     setImageUrls(item.images || []);
     setPendingFiles([]);
@@ -157,9 +156,8 @@ export default function AdminRooms() {
 
   const tabCounts = {
     all: items.length,
-    rooms: items.filter((i) => i.category === 'rooms').length,
-    pool: items.filter((i) => i.category === 'pool').length,
-    amenities: items.filter((i) => i.category === 'amenities').length,
+    inside: items.filter((i) => i.category === 'inside').length,
+    outside: items.filter((i) => i.category === 'outside').length,
   };
 
   return (
@@ -303,7 +301,7 @@ export default function AdminRooms() {
                   required
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder={`e.g. ${form.category === 'rooms' ? 'Deluxe Suite' : form.category === 'pool' ? 'Infinity Pool' : 'Free Wi-Fi'}`}
+                  placeholder={`e.g. ${form.category === 'inside' ? 'Master Bedroom' : 'Swimming Pool'}`}
                   className="w-full border border-stone-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
                 />
               </div>

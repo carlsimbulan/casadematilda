@@ -1,19 +1,18 @@
 import { useEffect, useState } from 'react';
-import { BedDouble, Waves, Star } from 'lucide-react';
+import { Home, Trees } from 'lucide-react';
 import api from '../api/axios.js';
 import RoomCard from '../components/RoomCard.jsx';
-import { useAuth } from '../context/AuthContext.jsx';
+
 const TABS = [
-  { value: 'rooms', label: 'Rooms', Icon: BedDouble },
-  { value: 'pool', label: 'Pool', Icon: Waves },
-  { value: 'amenities', label: 'Amenities', Icon: Star },
+  { value: 'inside', label: 'Inside', Icon: Home },
+  { value: 'outside', label: 'Outside', Icon: Trees },
 ];
 
 export default function Rooms() {
-  const { user } = useAuth();
-  const [items, setItems] = useState([]);  const [loading, setLoading] = useState(true);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState('rooms');
+  const [activeTab, setActiveTab] = useState('inside');
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -36,16 +35,12 @@ export default function Rooms() {
 
   return (
     <div className="bg-stone-50">
-      {!user && (
-        <div className="bg-stone-800 text-white py-16 text-center">
-          <h1 className="text-4xl font-bold text-amber-400 mb-3">Casa de Matilda</h1>
-          <p className="text-stone-300 text-lg max-w-xl mx-auto">
-            Explore our rooms, pool, and amenities.
-          </p>
-        </div>
-      )}
-
-      {/* Tabs */}      <div className="bg-white border-b border-stone-200 sticky top-0 z-10 shadow-sm">
+      <div className="bg-stone-800 text-white py-16 text-center">
+        <h1 className="text-4xl font-bold text-amber-400 mb-3">Our Gallery</h1>
+        <p className="text-stone-300 text-lg max-w-xl mx-auto">
+          Explore inside and outside of Casa de Matilda.
+        </p>
+      </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-1">
             {TABS.map(({ value, label, Icon }) => (
