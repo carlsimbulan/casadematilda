@@ -5,13 +5,13 @@ import toast from 'react-hot-toast';
 import api from '../../api/axios.js';
 
 const StatCard = ({ icon: Icon, label, value, colorClass, iconColor }) => (
-  <div className={`bg-white rounded-2xl p-6 shadow-md flex items-center gap-4 border-l-4 ${colorClass}`}>
-    <div className={`p-3 rounded-xl ${iconColor}`}>
-      <Icon className="w-6 h-6" />
+  <div className={`bg-white rounded-2xl p-4 sm:p-6 shadow-md flex items-center gap-4 border-l-4 ${colorClass} overflow-hidden`}>
+    <div className={`p-2 sm:p-3 rounded-xl ${iconColor}`}>
+      <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
     </div>
-    <div>
-      <p className="text-stone-500 text-sm font-medium">{label}</p>
-      <p className="text-3xl font-bold text-stone-800">{value ?? '—'}</p>
+    <div className="min-w-0">
+      <p className="text-stone-500 text-sm font-medium break-words">{label}</p>
+      <p className="text-3xl font-bold text-stone-800 truncate">{value ?? '—'}</p>
     </div>
   </div>
 );
@@ -90,7 +90,7 @@ export default function AdminDashboard() {
 
         {stats && (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
               <StatCard icon={BedDouble} label="Total Rooms" value={stats.totalRooms} colorClass="border-teal-500" iconColor="bg-teal-100 text-teal-600" />
               <StatCard icon={Users} label="Total Users" value={stats.totalUsers} colorClass="border-stone-400" iconColor="bg-stone-100 text-stone-600" />
               <StatCard icon={CalendarDays} label="Total Reservations" value={stats.totalReservations} colorClass="border-amber-500" iconColor="bg-amber-100 text-amber-600" />
@@ -100,30 +100,30 @@ export default function AdminDashboard() {
             </div>
 
             {/* Quick Links */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="grid grid-cols-2 gap-5">
               <Link
                 to="/admin/rooms"
-                className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow flex items-center gap-4 group"
+                className="bg-white rounded-2xl shadow-md p-4 sm:p-6 hover:shadow-lg transition-shadow flex items-center gap-4 group overflow-hidden"
               >
-                <div className="bg-teal-100 text-teal-700 w-14 h-14 flex items-center justify-center rounded-xl group-hover:scale-110 transition-transform">
-                  <BedDouble className="w-7 h-7" />
+                <div className="bg-teal-100 text-teal-700 w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-xl group-hover:scale-110 transition-transform">
+                  <BedDouble className="w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
-                <div>
-                  <h3 className="font-bold text-stone-800 text-lg">Manage Rooms</h3>
-                  <p className="text-stone-500 text-sm">Add, edit, or remove rooms</p>
+                <div className="min-w-0">
+                  <h3 className="font-bold text-stone-800 text-lg break-words">Manage Rooms</h3>
+                  <p className="text-stone-500 text-sm break-words">Add, edit, or remove rooms</p>
                 </div>
               </Link>
 
               <Link
                 to="/admin/reservations"
-                className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow flex items-center gap-4 group"
+                className="bg-white rounded-2xl shadow-md p-4 sm:p-6 hover:shadow-lg transition-shadow flex items-center gap-4 group overflow-hidden"
               >
-                <div className="bg-amber-100 text-amber-700 w-14 h-14 flex items-center justify-center rounded-xl group-hover:scale-110 transition-transform">
-                  <ClipboardList className="w-7 h-7" />
+                <div className="bg-amber-100 text-amber-700 w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-xl group-hover:scale-110 transition-transform">
+                  <ClipboardList className="w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
-                <div>
-                  <h3 className="font-bold text-stone-800 text-lg">Manage Reservations</h3>
-                  <p className="text-stone-500 text-sm">View and update booking statuses</p>
+                <div className="min-w-0">
+                  <h3 className="font-bold text-stone-800 text-lg break-words">Manage Reservations</h3>
+                  <p className="text-stone-500 text-sm break-words">View and update booking statuses</p>
                 </div>
               </Link>
             </div>
@@ -151,28 +151,32 @@ export default function AdminDashboard() {
               </div>
 
               {editingRate ? (
-                <div className="flex items-center gap-3">
-                  <span className="text-stone-500 font-medium">₱</span>
-                  <input
-                    type="number"
-                    min={0}
-                    value={nightlyRate}
-                    onChange={(e) => setNightlyRate(e.target.value)}
-                    className="flex-1 border border-stone-300 rounded-xl px-4 py-2.5 text-stone-800 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-amber-400"
-                  />
-                  <button
-                    onClick={handleSaveRate}
-                    disabled={savingRate}
-                    className="bg-amber-500 hover:bg-amber-600 disabled:bg-stone-300 text-stone-900 font-semibold px-5 py-2.5 rounded-xl transition-colors"
-                  >
-                    {savingRate ? 'Saving...' : 'Save'}
-                  </button>
-                  <button
-                    onClick={() => setEditingRate(false)}
-                    className="border border-stone-300 text-stone-600 hover:bg-stone-50 font-semibold px-4 py-2.5 rounded-xl transition-colors"
-                  >
-                    Cancel
-                  </button>
+                <div className="w-full flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                  <div className="flex items-center w-full sm:w-auto">
+                    <span className="text-stone-500 font-medium mr-2">₱</span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={nightlyRate}
+                      onChange={(e) => setNightlyRate(e.target.value)}
+                      className="flex-1 w-full sm:w-48 border border-stone-300 rounded-xl px-4 py-2.5 text-stone-800 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-amber-400"
+                    />
+                  </div>
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <button
+                      onClick={handleSaveRate}
+                      disabled={savingRate}
+                      className="flex-1 sm:flex-none bg-amber-500 hover:bg-amber-600 disabled:bg-stone-300 text-stone-900 font-semibold px-5 py-2.5 rounded-xl transition-colors text-center"
+                    >
+                      {savingRate ? 'Saving...' : 'Save'}
+                    </button>
+                    <button
+                      onClick={() => setEditingRate(false)}
+                      className="flex-1 sm:flex-none border border-stone-300 text-stone-600 hover:bg-stone-50 font-semibold px-4 py-2.5 rounded-xl transition-colors text-center"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="text-3xl font-bold text-amber-600">
