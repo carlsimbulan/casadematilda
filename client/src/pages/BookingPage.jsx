@@ -100,33 +100,34 @@ export default function BookingPage() {
 
   return (
     <div className="bg-stone-50 py-12">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <h1 className="text-3xl font-bold text-stone-800 mb-1">Book Casa de Matilda</h1>
         <p className="text-stone-500 mb-8">Reserve the entire property exclusively for your group.</p>
 
-        {/* What's Included */}
-        <div className="bg-white rounded-2xl shadow-md p-6 mb-6">
-          <h2 className="text-xl font-bold text-stone-800 mb-4">What's Included</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {AMENITIES.map(({ icon: Icon, label }) => (
-              <div
-                key={label}
-                className="bg-amber-50 text-stone-700 text-sm font-medium px-3 py-2.5 rounded-xl border border-amber-100 flex items-center gap-2"
-              >
-                <Icon className="w-4 h-4 text-amber-600 flex-shrink-0" />
-                {label}
-              </div>
-            ))}
+        <div className="grid gap-6 lg:grid-cols-[1fr_1.05fr] items-start">
+          {/* What's Included */}
+          <div className="bg-white rounded-2xl shadow-md p-6">
+            <h2 className="text-xl font-bold text-stone-800 mb-4">What's Included</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {AMENITIES.map(({ icon: Icon, label }) => (
+                <div
+                  key={label}
+                  className="bg-amber-50 text-stone-700 text-sm font-medium px-3 py-2.5 rounded-xl border border-amber-100 flex items-center gap-2"
+                >
+                  <Icon className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                  {label}
+                </div>
+              ))}
+            </div>
+            <p className="mt-4 text-stone-500 text-sm leading-relaxed">
+              When you book Casa de Matilda, you get the <strong>entire property</strong> — both
+              rooms, the swimming pool, garden, and all amenities. Perfect for families and barkada
+              getaways!
+            </p>
           </div>
-          <p className="mt-4 text-stone-500 text-sm leading-relaxed">
-            When you book Casa de Matilda, you get the <strong>entire property</strong> — both
-            rooms, the swimming pool, garden, and all amenities. Perfect for families and barkada
-            getaways!
-          </p>
-        </div>
 
-        {/* Booking Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-md p-6 sm:p-8 space-y-5">
+          {/* Booking Form */}
+          <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-md p-6 sm:p-8 space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <label className="block text-stone-700 font-medium mb-1.5" htmlFor="checkIn">
@@ -237,5 +238,6 @@ export default function BookingPage() {
         </form>
       </div>
     </div>
+  </div>
   );
 }

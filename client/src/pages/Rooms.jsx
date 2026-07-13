@@ -35,30 +35,30 @@ export default function Rooms() {
 
   return (
     <div className="bg-stone-50">
-      <div className="bg-stone-800 text-white py-16 text-center">
-        <h1 className="text-4xl font-bold text-amber-400 mb-3">Our Gallery</h1>
-        <p className="text-stone-300 text-lg max-w-xl mx-auto">
-          Explore inside and outside of Casa de Matilda.
-        </p>
-      </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-1">
-            {TABS.map(({ value, label, Icon }) => (
-              <button
-                key={value}
-                onClick={() => setActiveTab(value)}
-                className={`flex items-center gap-2 px-6 py-4 text-sm font-semibold border-b-2 transition-colors ${
-                  activeTab === value
-                    ? 'border-amber-500 text-amber-600'
-                    : 'border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                {label}
-              </button>
-            ))}
-          </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-stone-900 mb-3">Our Gallery</h1>
+          <p className="text-stone-600 text-lg max-w-xl mx-auto">
+            Explore inside and outside of Casa de Matilda.
+          </p>
         </div>
+        <div className="flex gap-1">
+          {TABS.map(({ value, label, Icon }) => (
+            <button
+              key={value}
+              onClick={() => setActiveTab(value)}
+              className={`flex items-center gap-2 px-6 py-4 text-sm font-semibold border-b-2 transition-colors ${
+                activeTab === value
+                  ? 'border-amber-500 text-amber-600'
+                  : 'border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
