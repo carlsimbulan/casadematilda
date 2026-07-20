@@ -116,14 +116,7 @@ export default function RoomDetail() {
                 )}
               </div>
 
-              <div className="mt-6">
-                <Link
-                  to="/rooms"
-                  className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium"
-                >
-                  <ArrowLeft className="w-4 h-4" /> Back to Gallery
-                </Link>
-              </div>
+
             </div>
 
           </div>

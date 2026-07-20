@@ -17,15 +17,15 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="relative z-50 bg-stone-800 text-amber-100 shadow-lg">
+    <nav className="sticky top-0 z-50 bg-stone-800 text-amber-100 shadow-lg">
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-24">
           <Link
             to="/"
             className="flex items-center hover:opacity-80 transition-opacity"
             onClick={closeMenu}
           >
-            <img src={logo} alt="Casa de Matilda" className="h-10 w-auto object-contain" />
+            <img src={logo} alt="Casa de Matilda" className="h-16 w-auto object-contain" />
           </Link>
 
           <div className="hidden md:flex items-center gap-6">

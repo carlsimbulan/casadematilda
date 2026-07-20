@@ -86,9 +86,18 @@ export default function AuthDrawer({ isOpen, onClose, initialMode = 'login' }) {
 
   return (
     <>
-      {/* Drawer panel — no backdrop overlay */}
+      {/* Backdrop — click outside to close */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-30"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Drawer panel */}
       <div
-        className={`fixed top-16 right-0 h-[calc(100%-4rem)] w-full sm:w-96 bg-white z-40 shadow-2xl flex flex-col transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'}`}
+        className={`fixed top-24 right-0 h-[calc(100%-6rem)] w-full sm:w-96 bg-white z-40 shadow-2xl flex flex-col transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'}`}
         aria-hidden={!isOpen}
       >
         {/* Body */}
